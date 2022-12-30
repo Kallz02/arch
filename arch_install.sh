@@ -126,10 +126,9 @@ alias df='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 df config --local status.showUntrackedFiles no
 paru -Syy
 paru -S alhp-keyring alhp-mirrorlist
-
-cp /etc/pacman.conf /etc/pacman.conf2
-rm /etc/pacman.conf
-ln -s ~/pacman.conf /etc/pacman.conf
+sudo cp /etc/pacman.conf /etc/pacman.conf2
+sudo rm /etc/pacman.conf
+sudo ln -s ~/pacman.conf /etc/pacman.conf
 
 paru -Syy
 #cachyos repo
@@ -145,12 +144,12 @@ paru -Syy
 
 #paru -Syu --needed - < pkglist.txt
 paru -Syu - < pkglist.txt
-cp /etc/default/grub /etc/default/grub.1
-rm /etc/default/grub
-ln -s ~/grub /etc/default/grub
-grub-mkconfig -o /boot/grub/grub.cfg
+sudo cp /etc/default/grub /etc/default/grub.1
+sudo rm /etc/default/grub
+sudo ln -s ~/grub /etc/default/grub
+sudo grub-mkconfig -o /boot/grub/grub.cfg
 
 #sudo systemctl enable ananicy-cpp-git
 #sudo systemctl enable libvirt
 #bare repo
-exit
+
