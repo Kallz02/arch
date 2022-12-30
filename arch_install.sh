@@ -107,7 +107,7 @@ cd $HOME
 #confirm
 #curl -u "$githubuser:$githubpass" -X POST -d "{\"title\":\"`hostname`\",\"key\":\"$pub\"}" --header "x-github-otp: $otp" https://api.github.com/user/keys
 
-git clone --separate-git-dir=$HOME/.dotfiles  git@github.com:Kallz02/dotfiles.git tmpdotfiles
+git clone --separate-git-dir=$HOME/.dotfiles  https://github.com/Kallz02/dotfiles.git tmpdotfiles
 rsync --recursive --verbose --exclude '.git' tmpdotfiles/ $HOME/
 rm -r tmpdotfiles
 
@@ -124,12 +124,12 @@ cd cachyos-repo
 sudo ./cachyos-repo.sh
 cd
 #chaotic-aur
-pacman-key --recv-key FBA220DFC880C036 --keyserver keyserver.ubuntu.com
-pacman-key --lsign-key FBA220DFC880C036
-pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+sudo pacman-key --recv-key FBA220DFC880C036 --keyserver keyserver.ubuntu.com
+sudo pacman-key --lsign-key FBA220DFC880C036
+sudo pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
 
-echo "[chaotic-aur]" >>  /etc/pacman.conf
-echo "Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
+sudo echo "[chaotic-aur]" >>  /etc/pacman.conf
+sudo echo "Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
 #paru -Qqe > pkglist.txt
 paru -Syy
 #paru -Syu --needed - < pkglist.txt
