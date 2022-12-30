@@ -67,7 +67,12 @@ pacman -Sy --noconfirm xorg-server xorg-xinit xorg-xkill xorg-xsetroot xorg-xbac
      xcompmgr libnotify slock jq aria2 cowsay \
      dhcpcd connman wpa_supplicant rsync pamixer mpd ncmpcpp \
      zsh-syntax-highlighting xdg-user-dirs libconfig sddm \
-     bluez bluez-utils wget
+     bluez bluez-utils wget cinnamon alacritty nemo firefox
+#chaotic-aur
+
+pacman-key --recv-key FBA220DFC880C036 --keyserver keyserver.ubuntu.com
+pacman-key --lsign-key FBA220DFC880C036
+pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
 
 systemctl enable connman.service 
 systemctl enable sddm.service 
@@ -106,37 +111,44 @@ cd $HOME
 #echo
 #confirm
 #curl -u "$githubuser:$githubpass" -X POST -d "{\"title\":\"`hostname`\",\"key\":\"$pub\"}" --header "x-github-otp: $otp" https://api.github.com/user/keys
-
-git clone --separate-git-dir=$HOME/.dotfiles  https://github.com/Kallz02/dotfiles.git tmpdotfiles
-rsync --recursive --verbose --exclude '.git' tmpdotfiles/ $HOME/
-rm -r tmpdotfiles
-
 echo "Installing AUR helper"
 # paru: AUR helper
 git clone https://aur.archlinux.org/paru.git
 cd paru
 makepkg -fsri
 cd
+
+git clone --separate-git-dir=$HOME/.dotfiles  https://github.com/Kallz02/dotfiles.git tmpdotfiles
+rsync --recursive --verbose --exclude '.git' tmpdotfiles/ $HOME/
+rm -r tmpdotfiles
+
+sudo cp /etc/pacman.conf /etc/pacman.conf.1
+sudo rm /etc/pacman.conf
+sudo ln -s ~/pacman.conf /etc/pacman.conf
+
+
 #cachyos repo
 #wget https://mirror.cachyos.org/cachyos-repo.tar.xz
 #tar xvf cachyos-repo.tar.xz
 #cd cachyos-repo
 #sudo ./cachyos-repo.sh
 #cd
-#chaotic-aur
-sudo pacman-key --recv-key FBA220DFC880C036 --keyserver keyserver.ubuntu.com
-sudo pacman-key --lsign-key FBA220DFC880C036
-sudo pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
 
-sudo echo "[chaotic-aur]" >>  /etc/pacman.conf
-sudo echo "Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
+#sudo echo "[chaotic-aur]" >>  /etc/pacman.conf
+#sudo echo "Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
 #paru -Qqe > pkglist.txt
 paru -Syy
+paru -S alhp-keyring alhp-mirrorlist
 #paru -Syu --needed - < pkglist.txt
-paru -Syu - < pkglist.txt
 
-sudo systemctl enable ananicy-cpp-git
-sudo systemctl enable libvirt
+paru -Syu - < pkglist.txt
+sudo cp /etc/default/grub /etc/default/grub.1
+sudo rm /etc/default/grub
+sudo ln -s ~/grub /etc/default/grub
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+#sudo systemctl enable ananicy-cpp-git
+#sudo systemctl enable libvirt
 #bare repo
 alias df='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 df config --local status.showUntrackedFiles no
