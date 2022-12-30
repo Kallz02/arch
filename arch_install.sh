@@ -30,6 +30,7 @@ exit
 #part2
 printf '\033c'
 pacman -S --noconfirm sed
+sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
 sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 10/" /etc/pacman.conf
 ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
 hwclock --systohc
@@ -57,17 +58,18 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 pacman -S --noconfirm xorg-server xorg-xinit xorg-xkill xorg-xsetroot xorg-xbacklight xorg-xprop \
      noto-fonts noto-fonts-emoji noto-fonts-cjk ttf-jetbrains-mono ttf-joypixels ttf-font-awesome \
-     onlyoffice-bin mpv okular ffmpeg imagemagick  \
+     mpv ffmpeg imagemagick  \
      fzf xclip maim \
      zip unzip unrar p7zip xdotool papirus-icon-theme brightnessctl  \
      dosfstools ntfs-3g git sxhkd zsh pipewire pipewire-pulse pipewire-jack \
      neovim vim nano rsync dash \
      xcompmgr libnotify slock jq aria2 cowsay \
      dhcpcd connman wpa_supplicant rsync pamixer mpd ncmpcpp \
-     zsh-syntax-highlighting xdg-user-dirs libconfig \
+     zsh-syntax-highlighting xdg-user-dirs libconfig sddm \
      bluez bluez-utils
 
 systemctl enable connman.service 
+systemctl enable sddm.service 
 rm /bin/sh
 ln -s dash /bin/sh
 echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
@@ -86,17 +88,55 @@ exit
 #part3
 printf '\033c'
 cd $HOME
-git clone --separate-git-dir=$HOME/.dotfiles https://github.com/bugswriter/dotfiles.git tmpdotfiles
+
+read -p "Enter github email : " email
+echo "Using email $email"
+if [ ! -f ~/.ssh/id_rsa ]; then
+  ssh-keygen -t rsa -b 4096 -C "$email"
+  ssh-add ~/.ssh/id_rsa
+fi
+pub=`cat ~/.ssh/id_rsa.pub`
+read -p "Enter github username: " githubuser
+echo "Using username $githubuser"
+read -s -p "Enter github password for user $githubuser: " githubpass
+echo
+read -p "Enter github OTP: " otp
+echo "Using otp $otp"
+echo
+confirm
+curl -u "$githubuser:$githubpass" -X POST -d "{\"title\":\"`hostname`\",\"key\":\"$pub\"}" --header "x-github-otp: $otp" https://api.github.com/user/keys
+
+git clone --separate-git-dir=$HOME/.dotfiles  git@github.com:Kallz02/dotfiles.git tmpdotfiles
 rsync --recursive --verbose --exclude '.git' tmpdotfiles/ $HOME/
 rm -r tmpdotfiles
 
-
-# pikaur: AUR helper
-git clone https://aur.archlinux.org/pikaur.git
-cd pikaur
-makepkg -fsri
+echo "Installing AUR helper"
+# paru: AUR helper
+git clone https://aur.archlinux.org/paru.git
+cd paru
+makepkg -si
 cd
+#cachyos repo
+wget https://mirror.cachyos.org/cachyos-repo.tar.xz
+tar xvf cachyos-repo.tar.xz
+cd cachyos-repo
+sudo ./cachyos-repo.sh
+cd
+#chaotic-aur
+pacman-key --recv-key FBA220DFC880C036 --keyserver keyserver.ubuntu.com
+pacman-key --lsign-key FBA220DFC880C036
+pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
 
+echo "[chaotic-aur]" >>  /etc/pacman.conf
+echo "Include = /etc/pacman.d/chaotic-mirrorlist" /etc/pacman.conf
+#paru -Qqe > pkglist.txt
+paru -Syy
+#paru -Syu --needed - < pkglist.txt
+paru -Syu - < pkglist.txt
+
+sudo systemctl enable ananicy-cpp-git
+sudo systemctl enable libvirt
+#bare repo
 alias df='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 df config --local status.showUntrackedFiles no
 exit
