@@ -122,11 +122,16 @@ git clone --separate-git-dir=$HOME/.dotfiles  https://github.com/Kallz02/dotfile
 rsync --recursive --verbose --exclude '.git' tmpdotfiles/ $HOME/
 rm -r tmpdotfiles
 
-sudo cp /etc/pacman.conf /etc/pacman.conf.1
-sudo rm /etc/pacman.conf
-sudo ln -s ~/pacman.conf /etc/pacman.conf
+alias df='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+df config --local status.showUntrackedFiles no
+paru -Syy
+paru -S alhp-keyring alhp-mirrorlist
 
+cp /etc/pacman.conf /etc/pacman.conf2
+rm /etc/pacman.conf
+ln -s ~/pacman.conf /etc/pacman.conf
 
+paru -Syy
 #cachyos repo
 #wget https://mirror.cachyos.org/cachyos-repo.tar.xz
 #tar xvf cachyos-repo.tar.xz
@@ -137,19 +142,15 @@ sudo ln -s ~/pacman.conf /etc/pacman.conf
 #sudo echo "[chaotic-aur]" >>  /etc/pacman.conf
 #sudo echo "Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
 #paru -Qqe > pkglist.txt
-paru -Syy
-paru -S alhp-keyring alhp-mirrorlist
-#paru -Syu --needed - < pkglist.txt
 
+#paru -Syu --needed - < pkglist.txt
 paru -Syu - < pkglist.txt
-sudo cp /etc/default/grub /etc/default/grub.1
-sudo rm /etc/default/grub
-sudo ln -s ~/grub /etc/default/grub
-sudo grub-mkconfig -o /boot/grub/grub.cfg
+cp /etc/default/grub /etc/default/grub.1
+rm /etc/default/grub
+ln -s ~/grub /etc/default/grub
+grub-mkconfig -o /boot/grub/grub.cfg
 
 #sudo systemctl enable ananicy-cpp-git
 #sudo systemctl enable libvirt
 #bare repo
-alias df='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-df config --local status.showUntrackedFiles no
 exit
