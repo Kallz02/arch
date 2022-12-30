@@ -143,7 +143,11 @@ paru -Syy
 #paru -Qqe > pkglist.txt
 
 #paru -Syu --needed - < pkglist.txt
-paru -Syu - < pkglist.txt
+echo "Enter Username:"
+read usernme
+
+
+paru -Sddy - < /home/$usernme/pkglist.txt
 sudo cp /etc/default/grub /etc/default/grub.1
 sudo rm /etc/default/grub
 sudo ln -s ~/grub /etc/default/grub
