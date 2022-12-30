@@ -118,11 +118,11 @@ cd paru
 makepkg -fsri
 cd
 #cachyos repo
-wget https://mirror.cachyos.org/cachyos-repo.tar.xz
-tar xvf cachyos-repo.tar.xz
-cd cachyos-repo
-sudo ./cachyos-repo.sh
-cd
+#wget https://mirror.cachyos.org/cachyos-repo.tar.xz
+#tar xvf cachyos-repo.tar.xz
+#cd cachyos-repo
+#sudo ./cachyos-repo.sh
+#cd
 #chaotic-aur
 sudo pacman-key --recv-key FBA220DFC880C036 --keyserver keyserver.ubuntu.com
 sudo pacman-key --lsign-key FBA220DFC880C036
