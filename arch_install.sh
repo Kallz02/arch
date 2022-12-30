@@ -20,7 +20,7 @@ if [[ $answer = y ]] ; then
   mkfs.vfat -F 32 $efipartition
 fi
 mount $partition /mnt 
-pacstrap /mnt base base-devel linux linux-firmware intel-ucode
+pacstrap /mnt base base-devel linux linux-firmware amd-ucode
 genfstab -U /mnt >> /mnt/etc/fstab
 sed '1,/^#part2$/d' `basename $0` > /mnt/arch_install2.sh
 chmod +x /mnt/arch_install2.sh
@@ -60,14 +60,14 @@ grub-mkconfig -o /boot/grub/grub.cfg
 pacman -Sy --noconfirm xorg-server xorg-xinit xorg-xkill xorg-xsetroot xorg-xbacklight xorg-xprop \
      noto-fonts noto-fonts-emoji noto-fonts-cjk ttf-jetbrains-mono ttf-joypixels ttf-font-awesome \
      mpv ffmpeg imagemagick  \
-     fzf xclip maim \
+     fzf xclip maim openssh \
      zip unzip unrar p7zip xdotool papirus-icon-theme brightnessctl  \
      dosfstools ntfs-3g git sxhkd zsh pipewire pipewire-pulse pipewire-jack \
      neovim vim nano rsync dash \
      xcompmgr libnotify slock jq aria2 cowsay \
      dhcpcd connman wpa_supplicant rsync pamixer mpd ncmpcpp \
      zsh-syntax-highlighting xdg-user-dirs libconfig sddm \
-     bluez bluez-utils
+     bluez bluez-utils wget
 
 systemctl enable connman.service 
 systemctl enable sddm.service 
@@ -90,22 +90,22 @@ exit
 printf '\033c'
 cd $HOME
 
-read -p "Enter github email : " email
-echo "Using email $email"
-if [ ! -f ~/.ssh/id_rsa ]; then
-  ssh-keygen -t rsa -b 4096 -C "$email"
-  ssh-add ~/.ssh/id_rsa
-fi
-pub=`cat ~/.ssh/id_rsa.pub`
-read -p "Enter github username: " githubuser
-echo "Using username $githubuser"
-read -s -p "Enter github password for user $githubuser: " githubpass
-echo
-read -p "Enter github OTP: " otp
-echo "Using otp $otp"
-echo
-confirm
-curl -u "$githubuser:$githubpass" -X POST -d "{\"title\":\"`hostname`\",\"key\":\"$pub\"}" --header "x-github-otp: $otp" https://api.github.com/user/keys
+#read -p "Enter github email : " email
+#echo "Using email $email"
+#if [ ! -f ~/.ssh/id_rsa ]; then
+#  ssh-keygen -t rsa -b 4096 -C "$email"
+#  ssh-add ~/.ssh/id_rsa
+#fi
+#pub=`cat ~/.ssh/id_rsa.pub`
+#read -p "Enter github username: " githubuser
+#echo "Using username $githubuser"
+#read -s -p "Enter github password for user $githubuser: " githubpass
+#echo
+#read -p "Enter github OTP: " otp
+#echo "Using otp $otp"
+#echo
+#confirm
+#curl -u "$githubuser:$githubpass" -X POST -d "{\"title\":\"`hostname`\",\"key\":\"$pub\"}" --header "x-github-otp: $otp" https://api.github.com/user/keys
 
 git clone --separate-git-dir=$HOME/.dotfiles  git@github.com:Kallz02/dotfiles.git tmpdotfiles
 rsync --recursive --verbose --exclude '.git' tmpdotfiles/ $HOME/
@@ -115,7 +115,7 @@ echo "Installing AUR helper"
 # paru: AUR helper
 git clone https://aur.archlinux.org/paru.git
 cd paru
-makepkg -si
+makepkg -fsri
 cd
 #cachyos repo
 wget https://mirror.cachyos.org/cachyos-repo.tar.xz
