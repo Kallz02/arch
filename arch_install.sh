@@ -141,7 +141,9 @@ paru -Syy
 #sudo echo "[chaotic-aur]" >>  /etc/pacman.conf
 #sudo echo "Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
 #paru -Qqe > pkglist.txt
-
+sudo mkdir -p /usr/share/sddm/themes/Nordic 
+sudo ln -s ~/Nordic /usr/share/sddm/themes/Nordic 
+sudo ln -s  ~/sddm.conf /etc/sddm.conf
 #paru -Syu --needed - < pkglist.txt
 echo "Enter Username:"
 read usernme
