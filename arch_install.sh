@@ -20,7 +20,7 @@ if [[ $answer = y ]] ; then
   mkfs.vfat -F 32 $efipartition
 fi
 mount $partition /mnt 
-pacstrap /mnt base base-devel linux linux-firmware amd-ucode
+pacstrap /mnt base base-devel linux linux-firmware intel-ucode
 genfstab -U /mnt >> /mnt/etc/fstab
 sed '1,/^#part2$/d' `basename $0` > /mnt/arch_install2.sh
 chmod +x /mnt/arch_install2.sh
@@ -67,7 +67,7 @@ pacman -Sy --noconfirm xorg-server xorg-xinit xorg-xkill xorg-xsetroot xorg-xbac
      xcompmgr libnotify slock jq aria2 cowsay \
      dhcpcd connman wpa_supplicant rsync pamixer mpd ncmpcpp \
      zsh-syntax-highlighting xdg-user-dirs libconfig sddm \
-     bluez bluez-utils wget cinnamon alacritty nemo firefox
+     bluez bluez-utils wget cinnamon alacritty nemo firefox connman-gtk
 #chaotic-aur
 
 pacman-key --recv-key FBA220DFC880C036 --keyserver keyserver.ubuntu.com
@@ -145,17 +145,15 @@ sudo mkdir -p /usr/share/sddm/themes/Nordic
 sudo ln -s ~/Nordic /usr/share/sddm/themes/Nordic 
 sudo ln -s  ~/sddm.conf /etc/sddm.conf
 #paru -Syu --needed - < pkglist.txt
-echo "Enter Username:"
-read usernme
+#echo "Enter Username:"
+#read usernme
 
 
-paru -Sddy - < /home/$usernme/pkglist.txt
 sudo cp /etc/default/grub /etc/default/grub.1
 sudo rm /etc/default/grub
 sudo ln -s ~/grub /etc/default/grub
 sudo grub-mkconfig -o /boot/grub/grub.cfg
 
-#sudo systemctl enable ananicy-cpp-git
-#sudo systemctl enable libvirt
+
 #bare repo
 
