@@ -94,7 +94,7 @@ exit
 
 #part3
 printf '\033c'
-cd $HOME
+cd /home/akshayk
 
 #read -p "Enter github email : " email
 #echo "Using email $email"
