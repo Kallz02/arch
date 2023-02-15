@@ -16,8 +16,9 @@ mkfs.ext4 $partition
 echo "Enter EFI partition: "
 read efipartition
 mkfs.vfat -F 32 $efipartition
+mkdir /mnt
 mount $partition /mnt
-mkdir /mnt/boot
+mkdir /mnt/boot/
 mount $efipartition /mnt/boot
 read -p "Intel Or Amd CPU?[i/a]" answer
 if [[ $answer = i ]] ; then
@@ -147,7 +148,7 @@ sudo rm /etc/pacman.conf
 sudo ln -s ~/pacman.conf /etc/pacman.conf
 
 paru -Sy
-sudo wget "https://raw.githubusercontent.com/Kallz02/dotfiles/master/packagelist.txt" -O "/tmp/packagelist.txt" && paru -Sy --needed - < "/tmp/packagelist.txt"
+paru -Sy --needed - < "/home/akshayk/packagelist.txt"
 #Some Flatpak Stuff
 flatpak install org.onlyoffice.desktopeditors
 flatpak install de.shorsh.discord-screenaudio
