@@ -119,9 +119,9 @@ cd
 
 #Display Manager
 paru -Syy ly
-systemctl enable ly.service
+sudo systemctl enable ly.service
 
-sed -i "/^ExecStart/i ExecStartPre=/usr/bin/printf '%%b' '\\\\e]P0969FD4\\\\e]P7364B45\\\\ec'" /lib/systemd/system/ly.service
+sudo sed -i "/^ExecStart/i ExecStartPre=/usr/bin/printf '%%b' '\\\\e]P0969FD4\\\\e]P7364B45\\\\ec'" /lib/systemd/system/ly.service
 
  
 # echo "extracting dotfiles"
@@ -146,15 +146,15 @@ sudo rm /etc/pacman.conf
 sudo ln -s ~/pacman.conf /etc/pacman.conf
 
 paru -Sy
-
+sudo wget "https://raw.githubusercontent.com/Kallz02/dotfiles/master/packagelist.txt" -O "/tmp/packagelist.txt" && paru -Sy --needed - < "/tmp/packagelist.txt"
 #Some Flatpak Stuff
 flatpak install org.onlyoffice.desktopeditors
 flatpak install de.shorsh.discord-screenaudio
-flatpak override --filesystem=$HOME/.themes
-flatpak override --filesystem=$HOME/.icons 
-flatpak override --env=GTK_THEME=Juno-Ocean 
-flatpak override --env=ICON_THEME=Papirus
-wget "https://raw.githubusercontent.com/Kallz02/dotfiles/master/packagelist.txt" -O "/tmp/packagelist.txt" && paru -Sy --needed - < "/tmp/packagelist.txt"
+sudo flatpak override --filesystem=$HOME/.themes
+sudo flatpak override --filesystem=$HOME/.icons 
+sudo flatpak override --env=GTK_THEME=Juno-Ocean 
+sudo flatpak override --env=ICON_THEME=Papirus
+
 #cachyos repo
 #wget https://mirror.cachyos.org/cachyos-repo.tar.xz
 #tar xvf cachyos-repo.tar.xz
@@ -187,8 +187,8 @@ flatpak-spawn --host xdg-mime default org.onlyoffice.desktopeditors.desktop appl
 flatpak-spawn --host xdg-mime default org.onlyoffice.desktopeditors.desktop application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 flatpak-spawn --host xdg-mime default org.onlyoffice.desktopeditors.desktop application/vnd.openxmlformats-officedocument.presentationml.presentation
 
-systemctl enable ananicy-cpp
-systemctl enable syncthing@syncuser --now
+sudo systemctl enable ananicy-cpp
+sudo systemctl enable syncthing@syncuser --now
 
 xhost + local: #for wayland and xdisplay stuff
 echo "Final Grub Configuration based on local files"
