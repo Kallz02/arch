@@ -187,7 +187,8 @@ flatpak-spawn --host xdg-mime default org.onlyoffice.desktopeditors.desktop appl
 flatpak-spawn --host xdg-mime default org.onlyoffice.desktopeditors.desktop application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 flatpak-spawn --host xdg-mime default org.onlyoffice.desktopeditors.desktop application/vnd.openxmlformats-officedocument.presentationml.presentation
 
-
+systemctl enable ananicy-cpp
+systemctl enable syncthing@syncuser --now
 
 xhost + local: #for wayland and xdisplay stuff
 echo "Final Grub Configuration based on local files"
