@@ -94,6 +94,7 @@ exit
 
 #part3
 printf '\033c'
+su - akshayk
 cd /home/akshayk
 
 echo "Installing AUR helper"
