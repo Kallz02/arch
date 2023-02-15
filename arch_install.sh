@@ -17,7 +17,8 @@ echo "Enter EFI partition: "
 read efipartition
 mkfs.vfat -F 32 $efipartition
 mount $partition /mnt
-
+mkdir /mnt/boot
+mount $efipartition /mnt/boot
 read -p "Intel Or Amd CPU?[i/a]" answer
 if [[ $answer = i ]] ; then
   pacstrap /mnt base base-devel linux linux-firmware intel-ucode
