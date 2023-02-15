@@ -13,14 +13,18 @@ cfdisk $drive
 echo "Enter the linux partition: "
 read partition
 mkfs.ext4 $partition 
-read -p "Did you also create efi partition? [y/n]" answer
-if [[ $answer = y ]] ; then
-  echo "Enter EFI partition: "
-  read efipartition
-  mkfs.vfat -F 32 $efipartition
+echo "Enter EFI partition: "
+read efipartition
+mkfs.vfat -F 32 $efipartition
+mount $partition /mnt
+
+read -p "Intel Or Amd CPU?[i/a]" answer
+if [[ $answer = i ]] ; then
+  pacstrap /mnt base base-devel linux linux-firmware intel-ucode
+else
+  pacstrap /mnt base base-devel linux linux-firmware amd-ucode
 fi
-mount $partition /mnt 
-pacstrap /mnt base base-devel linux linux-firmware intel-ucode
+echo 'registering patitions in fstab and starting second script'
 genfstab -U /mnt >> /mnt/etc/fstab
 sed '1,/^#part2$/d' `basename $0` > /mnt/arch_install2.sh
 chmod +x /mnt/arch_install2.sh
@@ -48,11 +52,7 @@ echo "127.0.1.1       $hostname.localdomain $hostname" >> /etc/hosts
 mkinitcpio -P
 passwd
 pacman --noconfirm -S grub efibootmgr os-prober
-echo "Enter EFI partition: " 
-read efipartition
-mkdir /boot/efi
-mount $efipartition /boot/efi 
-grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 # sed -i 's/quiet/pci=noaer/g' /etc/default/grub
 # sed -i 's/GRUB_TIMEOUT=5/GRUB_TIMEOUT=0/g ' /etc/default/grub
 grub-mkconfig -o /boot/grub/grub.cfg
@@ -62,12 +62,12 @@ pacman -Sy --noconfirm xorg-server xorg-xinit xorg-xkill xorg-xsetroot xorg-xbac
      mpv ffmpeg imagemagick  \
      fzf xclip maim openssh \
      zip unzip unrar p7zip xdotool papirus-icon-theme brightnessctl  \
-     dosfstools ntfs-3g git sxhkd zsh pipewire pipewire-pulse pipewire-jack \
+     dosfstools ntfs-3g git zsh pipewire pipewire-pulse pipewire-jack \
      neovim vim nano rsync dash \
      xcompmgr libnotify slock jq aria2 cowsay \
      dhcpcd connman wpa_supplicant rsync pamixer mpd ncmpcpp \
-     zsh-syntax-highlighting xdg-user-dirs libconfig sddm \
-     bluez bluez-utils wget cinnamon alacritty nemo firefox connman-gtk
+     zsh-syntax-highlighting xdg-user-dirs libconfig \
+     bluez bluez-utils wget plasma alacritty nemo firefox flatpak 
 #chaotic-aur
 
 pacman-key --recv-key FBA220DFC880C036 --keyserver keyserver.ubuntu.com
@@ -75,7 +75,6 @@ pacman-key --lsign-key FBA220DFC880C036
 pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
 
 systemctl enable connman.service 
-systemctl enable sddm.service 
 rm /bin/sh
 ln -s dash /bin/sh
 echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
@@ -118,19 +117,44 @@ cd paru
 makepkg -fsri
 cd
 
-git clone --separate-git-dir=$HOME/.dotfiles  https://github.com/Kallz02/dotfiles.git tmpdotfiles
-rsync --recursive --verbose --exclude '.git' tmpdotfiles/ $HOME/
-rm -r tmpdotfiles
+#Display Manager
+paru -Syy ly
+systemctl enable ly.service
 
-alias df='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-df config --local status.showUntrackedFiles no
-paru -Syy
-paru -S alhp-keyring alhp-mirrorlist
+sed -i "/^ExecStart/i ExecStartPre=/usr/bin/printf '%%b' '\\\\e]P0969FD4\\\\e]P7364B45\\\\ec'" /lib/systemd/system/ly.service
+
+ 
+# echo "extracting dotfiles"
+# git clone --separate-git-dir=$HOME/.dotfiles  https://github.com/Kallz02/dotfiles.git tmpdotfiles
+# rsync --recursive --verbose --exclude '.git' tmpdotfiles/ $HOME/
+# rm -r tmpdotfiles
+# echo "Initialize bare repo"
+
+# git init --bare $HOME/dotfiles
+# alias dt='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME'
+# dt config --local status.showUntrackedFiles no
+# dt remote add origin  https://github.com/Kallz02/dotfiles.git
+# dt push -u origin master
+git clone --bare https://github.com/Kallz02/dotfiles.git ~/dotfiles
+alias dt='git --git-dir=$HOME/dotfiles --work-tree=$HOME'
+dt checkout -f
+
+dt config --local status.showUntrackedFiles no
+echo "Using local pacman.conf and creating a symlink"
 sudo cp /etc/pacman.conf /etc/pacman.conf2
 sudo rm /etc/pacman.conf
 sudo ln -s ~/pacman.conf /etc/pacman.conf
 
-paru -Syy
+paru -Sy
+
+#Some Flatpak Stuff
+flatpak install org.onlyoffice.desktopeditors
+flatpak install de.shorsh.discord-screenaudio
+flatpak override --filesystem=$HOME/.themes
+flatpak override --filesystem=$HOME/.icons 
+flatpak override --env=GTK_THEME=Juno-Ocean 
+flatpak override --env=ICON_THEME=Papirus
+wget "https://raw.githubusercontent.com/Kallz02/dotfiles/master/packagelist.txt" -O "/tmp/packagelist.txt" && paru -Sy --needed - < "/tmp/packagelist.txt"
 #cachyos repo
 #wget https://mirror.cachyos.org/cachyos-repo.tar.xz
 #tar xvf cachyos-repo.tar.xz
@@ -141,14 +165,32 @@ paru -Syy
 #sudo echo "[chaotic-aur]" >>  /etc/pacman.conf
 #sudo echo "Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
 #paru -Qqe > pkglist.txt
-sudo mkdir -p /usr/share/sddm/themes/Nordic 
-sudo ln -s ~/Nordic /usr/share/sddm/themes/Nordic 
-sudo ln -s  ~/sddm.conf /etc/sddm.conf
+# echo "SDDM configuration from local directory"
+# sudo mkdir -p /usr/share/sddm/themes/Nordic 
+# sudo ln -s ~/Nordic /usr/share/sddm/themes/Nordic 
+# sudo ln -s  ~/sddm.conf /etc/sddm.conf
 #paru -Syu --needed - < pkglist.txt
 #echo "Enter Username:"
 #read usernme
 
+# Set Brave Nightly as the default browser
+xdg-settings set default-web-browser brave-nightly.desktop
 
+# Set Nemo as the default file manager
+xdg-mime default nemo.desktop inode/directory
+
+# Set Okular as the default PDF viewer
+xdg-mime default org.kde.okular.desktop application/pdf
+
+# Set OnlyOffice as the default office suite (using Flatpak)
+flatpak-spawn --host xdg-mime default org.onlyoffice.desktopeditors.desktop application/vnd.openxmlformats-officedocument.wordprocessingml.document
+flatpak-spawn --host xdg-mime default org.onlyoffice.desktopeditors.desktop application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+flatpak-spawn --host xdg-mime default org.onlyoffice.desktopeditors.desktop application/vnd.openxmlformats-officedocument.presentationml.presentation
+
+
+
+xhost + local: #for wayland and xdisplay stuff
+echo "Final Grub Configuration based on local files"
 sudo cp /etc/default/grub /etc/default/grub.1
 sudo rm /etc/default/grub
 sudo ln -s ~/grub /etc/default/grub
