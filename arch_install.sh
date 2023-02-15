@@ -96,22 +96,6 @@ exit
 printf '\033c'
 cd /home/akshayk
 
-#read -p "Enter github email : " email
-#echo "Using email $email"
-#if [ ! -f ~/.ssh/id_rsa ]; then
-#  ssh-keygen -t rsa -b 4096 -C "$email"
-#  ssh-add ~/.ssh/id_rsa
-#fi
-#pub=`cat ~/.ssh/id_rsa.pub`
-#read -p "Enter github username: " githubuser
-#echo "Using username $githubuser"
-#read -s -p "Enter github password for user $githubuser: " githubpass
-#echo
-#read -p "Enter github OTP: " otp
-#echo "Using otp $otp"
-#echo
-#confirm
-#curl -u "$githubuser:$githubpass" -X POST -d "{\"title\":\"`hostname`\",\"key\":\"$pub\"}" --header "x-github-otp: $otp" https://api.github.com/user/keys
 echo "Installing AUR helper"
 # paru: AUR helper
 git clone https://aur.archlinux.org/paru.git
@@ -125,18 +109,7 @@ sudo systemctl enable ly.service
 
 sudo sed -i "/^ExecStart/i ExecStartPre=/usr/bin/printf '%%b' '\\\\e]P0969FD4\\\\e]P7364B45\\\\ec'" /lib/systemd/system/ly.service
 
- 
-# echo "extracting dotfiles"
-# git clone --separate-git-dir=$HOME/.dotfiles  https://github.com/Kallz02/dotfiles.git tmpdotfiles
-# rsync --recursive --verbose --exclude '.git' tmpdotfiles/ $HOME/
-# rm -r tmpdotfiles
-# echo "Initialize bare repo"
 
-# git init --bare $HOME/dotfiles
-# alias dt='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME'
-# dt config --local status.showUntrackedFiles no
-# dt remote add origin  https://github.com/Kallz02/dotfiles.git
-# dt push -u origin master
 git clone --bare https://github.com/Kallz02/dotfiles.git ~/dotfiles
 alias dt='git --git-dir=$HOME/dotfiles --work-tree=$HOME'
 dt checkout -f
@@ -146,6 +119,13 @@ echo "Using local pacman.conf and creating a symlink"
 sudo cp /etc/pacman.conf /etc/pacman.conf2
 sudo rm /etc/pacman.conf
 sudo ln -s ~/pacman.conf /etc/pacman.conf
+
+xhost + local: #for wayland and xdisplay stuff
+echo "Final Grub Configuration based on local files"
+sudo cp /etc/default/grub /etc/default/grub.1
+sudo rm /etc/default/grub
+sudo ln -s ~/grub /etc/default/grub
+sudo grub-mkconfig -o /boot/grub/grub.cfg
 
 paru -Sy
 paru -Sy --needed - < "/home/akshayk/packagelist.txt"
@@ -157,23 +137,6 @@ sudo flatpak override --filesystem=$HOME/.icons
 sudo flatpak override --env=GTK_THEME=Juno-Ocean 
 sudo flatpak override --env=ICON_THEME=Papirus
 
-#cachyos repo
-#wget https://mirror.cachyos.org/cachyos-repo.tar.xz
-#tar xvf cachyos-repo.tar.xz
-#cd cachyos-repo
-#sudo ./cachyos-repo.sh
-#cd
-
-#sudo echo "[chaotic-aur]" >>  /etc/pacman.conf
-#sudo echo "Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
-#paru -Qqe > pkglist.txt
-# echo "SDDM configuration from local directory"
-# sudo mkdir -p /usr/share/sddm/themes/Nordic 
-# sudo ln -s ~/Nordic /usr/share/sddm/themes/Nordic 
-# sudo ln -s  ~/sddm.conf /etc/sddm.conf
-#paru -Syu --needed - < pkglist.txt
-#echo "Enter Username:"
-#read usernme
 
 # Set Brave Nightly as the default browser
 xdg-settings set default-web-browser brave-nightly.desktop
@@ -191,13 +154,6 @@ flatpak-spawn --host xdg-mime default org.onlyoffice.desktopeditors.desktop appl
 
 sudo systemctl enable ananicy-cpp
 sudo systemctl enable syncthing@syncuser --now
-
-xhost + local: #for wayland and xdisplay stuff
-echo "Final Grub Configuration based on local files"
-sudo cp /etc/default/grub /etc/default/grub.1
-sudo rm /etc/default/grub
-sudo ln -s ~/grub /etc/default/grub
-sudo grub-mkconfig -o /boot/grub/grub.cfg
 
 
 #bare repo
