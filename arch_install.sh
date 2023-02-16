@@ -127,7 +127,9 @@ sudo cp /etc/default/grub /etc/default/grub.1
 sudo rm /etc/default/grub
 sudo ln -s ~/grub /etc/default/grub
 sudo grub-mkconfig -o /boot/grub/grub.cfg
-
+sudo usermod -a -G flutterusers akshayk
+git config --global --add safe.directory /opt/flutter
+cd /opt/android-studio && sudo ln -s jbr jre
 paru -Sy
 paru -Sy --needed - < "/home/akshayk/packagelist.txt"
 #Some Flatpak Stuff
