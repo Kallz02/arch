@@ -133,6 +133,8 @@ cd /opt/android-studio && sudo ln -s jbr jre
 paru -Sy
 paru -Sy --needed - < "/home/akshayk/packagelist.txt"
 #Some Flatpak Stuff
+paru -S flatpak-xdg-utils docker apparmor && mkdir docker && cd docker && wget https://desktop.docker.com/linux/main/amd64/docker-desktop-4.15.0-x86_64.pkg.tar.zst && sudo pacman -U ./docker-desktop-*.pkg.tar.zst
+
 flatpak install org.onlyoffice.desktopeditors
 flatpak install de.shorsh.discord-screenaudio
 sudo flatpak override --filesystem=$HOME/.themes
@@ -155,9 +157,13 @@ flatpak-spawn --host xdg-mime default org.onlyoffice.desktopeditors.desktop appl
 flatpak-spawn --host xdg-mime default org.onlyoffice.desktopeditors.desktop application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 flatpak-spawn --host xdg-mime default org.onlyoffice.desktopeditors.desktop application/vnd.openxmlformats-officedocument.presentationml.presentation
 
-sudo systemctl enable ananicy-cpp
-sudo systemctl enable syncthing@syncuser --now
 
+
+
+sudo systemctl enable ananicy-cpp
+sudo systemctl enable syncthing@akshayk --now
+sudo systemctl enable apparmor.service 
+systemctl enable --user docker-desktop
 
 #bare repo
 
