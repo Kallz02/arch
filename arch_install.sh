@@ -69,14 +69,14 @@ pacman -Sy --noconfirm xorg-server xorg-xinit xorg-xkill xorg-xsetroot xorg-xbac
      xcompmgr libnotify slock jq aria2 cowsay \
      dhcpcd connman wpa_supplicant rsync pamixer mpd ncmpcpp \
      zsh-syntax-highlighting xdg-user-dirs libconfig \
-     bluez bluez-utils wget plasma alacritty nemo firefox flatpak 
+     bluez bluez-utils wget plasma alacritty nemo firefox flatpak networkmanager 
 #chaotic-aur
 
 pacman-key --recv-key FBA220DFC880C036 --keyserver keyserver.ubuntu.com
 pacman-key --lsign-key FBA220DFC880C036
 pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
 
-systemctl enable connman.service 
+systemctl enable NetworkManager.service 
 rm /bin/sh
 ln -s dash /bin/sh
 echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
@@ -133,7 +133,7 @@ cd /opt/android-studio && sudo ln -s jbr jre
 paru -Sy
 paru -Sy --needed - < "/home/akshayk/packagelist.txt"
 #Some Flatpak Stuff
-paru -S flatpak-xdg-utils docker apparmor && mkdir docker && cd docker && wget https://desktop.docker.com/linux/main/amd64/docker-desktop-4.15.0-x86_64.pkg.tar.zst && sudo pacman -U ./docker-desktop-*.pkg.tar.zst
+paru -S flatpak-xdg-utils docker apparmor zst
 
 flatpak install org.onlyoffice.desktopeditors
 flatpak install de.shorsh.discord-screenaudio
@@ -163,7 +163,6 @@ flatpak-spawn --host xdg-mime default org.onlyoffice.desktopeditors.desktop appl
 sudo systemctl enable ananicy-cpp
 sudo systemctl enable syncthing@akshayk --now
 sudo systemctl enable apparmor.service 
-systemctl enable --user docker-desktop
 
 #bare repo
 
