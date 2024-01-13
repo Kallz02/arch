@@ -55,8 +55,8 @@ mkinitcpio -P
 passwd
 pacman --noconfirm -S grub efibootmgr os-prober
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
-# sed -i 's/quiet/pci=noaer/g' /etc/default/grub
-# sed -i 's/GRUB_TIMEOUT=5/GRUB_TIMEOUT=0/g ' /etc/default/grub
+sed -i 's/quiet/pci=noaer/g' /etc/default/grub
+sed -i 's/GRUB_TIMEOUT=5/GRUB_TIMEOUT=0/g ' /etc/default/grub
 grub-mkconfig -o /boot/grub/grub.cfg
 
 pacman -Sy --noconfirm xorg-server xorg-xinit xorg-xkill xorg-xsetroot xorg-xbacklight xorg-xprop \
@@ -67,9 +67,9 @@ pacman -Sy --noconfirm xorg-server xorg-xinit xorg-xkill xorg-xsetroot xorg-xbac
      dosfstools ntfs-3g git zsh pipewire pipewire-pulse pipewire-jack \
      neovim vim nano rsync dash \
      xcompmgr libnotify slock jq aria2 cowsay \
-     dhcpcd connman wpa_supplicant rsync pamixer mpd ncmpcpp \
+     dhcpcd wpa_supplicant rsync pamixer mpd ncmpcpp \
      zsh-syntax-highlighting xdg-user-dirs libconfig \
-     bluez bluez-utils wget plasma alacritty nemo firefox flatpak networkmanager 
+     bluez bluez-utils wget alacritty nemo firefox flatpak networkmanager 
 #chaotic-aur
 
 pacman-key --recv-key FBA220DFC880C036 --keyserver keyserver.ubuntu.com
@@ -94,8 +94,10 @@ exit
 
 #part3
 printf '\033c'
-su - akshayk
-cd /home/akshayk
+echo "Enter Username: "
+read username
+su - $username
+cd /home/$username
 
 echo "Installing AUR helper"
 # paru: AUR helper
@@ -105,10 +107,10 @@ makepkg -fsri
 cd
 
 #Display Manager
-paru -Syy ly
-sudo systemctl enable ly.service
+paru -Syy gdm
+sudo systemctl enable gdm.service
 
-sudo sed -i "/^ExecStart/i ExecStartPre=/usr/bin/printf '%%b' '\\\\e]P0969FD4\\\\e]P7364B45\\\\ec'" /lib/systemd/system/ly.service
+# sudo sed -i "/^ExecStart/i ExecStartPre=/usr/bin/printf '%%b' '\\\\e]P0969FD4\\\\e]P7364B45\\\\ec'" /lib/systemd/system/ly.service
 
 
 git clone --bare https://github.com/Kallz02/dotfiles.git ~/dotfiles
